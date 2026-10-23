@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Worker (skailFunc)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/SkailUsdQuote.Worker/bin/Debug/net8.0/SkailUsdQuote.Worker.dll",
+      "cwd": "${workspaceFolder}/src/SkailUsdQuote.Worker",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        // outside a container the web app is on localhost; the skail address comes from .env
+        "WEB_BASE_URL": "http://localhost:8080"
+      },
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Web (front end)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/SkailUsdQuote.Web/bin/Debug/net8.0/SkailUsdQuote.Web.dll",
+      "cwd": "${workspaceFolder}/src/SkailUsdQuote.Web",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "ASPNETCORE_URLS": "http://localhost:8080"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Worker + Web",
+      "configurations": ["Web (front end)", "Worker (skailFunc)"],
+      "stopAll": true
+    }
+  ]
+}
