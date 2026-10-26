@@ -34,7 +34,10 @@ build() {
 }
 
 down() {
-  "$ENGINE" rm -f "$WORKER" "$WEB" >/dev/null 2>&1 || true
+  # one call per container: podman stops at the first missing name and would leave the other one behind
+  for name in "$WORKER" "$WEB"; do
+    "$ENGINE" rm -f "$name" >/dev/null 2>&1 || true
+  done
 }
 
 up() {
