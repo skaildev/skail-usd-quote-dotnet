@@ -31,7 +31,7 @@ Os dois serviços falam com o seu environment do skail de formas diferentes, por
 | Serviço | Variável | Como | Para quê |
 |---|---|---|---|
 | **worker** (a skailFunc) | `SKAIL_SIDECAR` | A conexão do runtime do skail (SDK). **Não** usa a API HTTP pública. | Buscar trabalho de `GetUsdQuote` e seus commands e registrar os resultados. |
-| **web** | `SKAIL_BASE_URL` | A API HTTP do environment (a "Environment URL" no portal). | **Iniciar**: `POST {SKAIL_BASE_URL}/api/v1/trigger/{nome}/{versão}/GetUsdQuote/{runId}` com corpo `["{runId}","{currency}"]`. **Parar**: `POST {SKAIL_BASE_URL}/api/v1/fire/STOP_QUOTE/{runId}` com corpo `{}`. |
+| **web** | `SKAIL_BASE_URL` | A API HTTP do servidor skail (mesmo endereço de `SKAIL_SIDECAR`, que o worker usa). | **Iniciar**: `POST {SKAIL_BASE_URL}/api/v1/trigger/{nome}/{versão}/GetUsdQuote/{runId}` com corpo `["{runId}","{currency}"]`. **Parar**: `POST {SKAIL_BASE_URL}/api/v1/fire/STOP_QUOTE/{runId}` com corpo `{}`. |
 
 Ambos usam o mesmo `SKAIL_NAMESPACE`, `SKAIL_KEY` e `SKAIL_WORKLOAD` (`nome:versão`, separado em `{nome}` e
 `{versão}` da rota). O web envia `Accept` e `Content-Type: application/json`, o header `Skail-namespace` e a
@@ -49,8 +49,8 @@ O navegador nunca chama o skail: ele só fala com o web, então a chave fica no 
 
 - SDK .NET 8 e VS Code (C# Dev Kit recomendado)
 - podman ou docker
-- Um environment do skail no portal: o namespace, a chave, o endereço do servidor skail (o sidecar ao
-  qual o worker se conecta) e a URL base da API HTTP (usada para trigger e fire).
+- Um environment do skail no portal: o namespace, a chave e o endereço do servidor skail (o sidecar ao
+  qual o worker se conecta).
   No portal, registre também o workload `nome:versão`.
 - Um navegador atual (Chrome/Edge 111+, Firefox 113+, Safari 16.2+). A página usa Server-Sent Events,
   `color-mix()` do CSS e JavaScript moderno; o Internet Explorer não é suportado.
@@ -63,7 +63,7 @@ cp .env.example .env     # o .env guarda segredos e é ignorado pelo git
 
 Preencha `SKAIL_WORKLOAD` (exatamente como registrado no portal), `SKAIL_NAMESPACE` e `SKAIL_KEY`
 (do seu environment no portal), `SKAIL_SIDECAR` (o endereço do servidor skail desse environment) e
-`SKAIL_BASE_URL` (a URL base da API HTTP dele). Os demais valores são ajustes padrão do runtime.
+`SKAIL_BASE_URL` (mesmo valor de `SKAIL_SIDECAR`; o web o usa para a API HTTP). Os demais valores são ajustes padrão do runtime.
 
 ## Rodar com podman / docker
 

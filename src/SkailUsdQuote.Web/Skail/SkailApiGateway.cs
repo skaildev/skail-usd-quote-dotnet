@@ -6,7 +6,7 @@ using SkailUsdQuote.Contracts;
 namespace SkailUsdQuote.Web.Skail;
 
 /// <summary>
-/// Calls the skail HTTP API of the environment (the "Environment URL" of the portal):
+/// Calls the skail HTTP API of the environment (same address as SKAIL_SIDECAR):
 /// POST {base}/api/v1/trigger/{workload}/{version}/{function}/{id} and POST {base}/api/v1/fire/{event}/{instanceId}.
 /// The key goes in both skail-key (documented) and Authorization: Bearer (required by the environment gateway).
 /// Both calls are outside skail's durability, so transient failures are retried with the same id and body.
@@ -32,7 +32,7 @@ public sealed class SkailApiGateway(HttpClient http, SkailOptions options, Func<
     private async Task PostAsync(string route, string body, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(options.BaseUrl))
-            throw new SkailGatewayException("SKAIL_BASE_URL is not set (the API base URL is shown in the skail portal)");
+            throw new SkailGatewayException("SKAIL_BASE_URL is not set (the skail server address, same value as SKAIL_SIDECAR)");
 
         var url = $"{options.BaseUrl.TrimEnd('/')}/{route}";
         var failure = "";

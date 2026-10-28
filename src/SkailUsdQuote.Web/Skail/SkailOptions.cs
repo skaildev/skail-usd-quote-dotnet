@@ -2,7 +2,7 @@ namespace SkailUsdQuote.Web.Skail;
 
 public sealed class SkailOptions
 {
-    /// <summary>Base URL of the skail HTTP API for the environment (SKAIL_BASE_URL, shown in the skail portal).</summary>
+    /// <summary>Base URL of the skail HTTP API for the environment (SKAIL_BASE_URL, same value as SKAIL_SIDECAR).</summary>
     public string BaseUrl { get; init; } = "";
 
     /// <summary>SKAIL_NAMESPACE (tenant/environment), sent in the Skail-namespace header.</summary>
