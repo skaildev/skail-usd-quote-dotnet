@@ -14,7 +14,7 @@ builder.Services.AddHttpClient<ISkailGateway, SkailApiGateway>(c => c.Timeout = 
 var app = builder.Build();
 
 app.UseDefaultFiles();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = ctx => ctx.Context.Response.Headers.CacheControl = "no-cache" });
 
 app.MapGet("/healthz", () => Results.Ok("ok"));
 
