@@ -89,7 +89,7 @@ function Show-Logs {
     if ($LASTEXITCODE -ne 0) { & $Engine logs -f $Worker }
 }
 
-switch ($Command) {
+switch ($Command.Trim()) {
     'build' { Build-Images }
     'up' { Start-Stack }
     'down' { Remove-Containers }
