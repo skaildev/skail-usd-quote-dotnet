@@ -49,6 +49,7 @@ O navegador nunca chama o skail: ele só fala com o web, então a chave fica no 
 
 - SDK .NET 8 e VS Code (C# Dev Kit recomendado)
 - podman ou docker
+- PowerShell 7+ (`pwsh`), só se você usar `scripts/run.ps1` (por exemplo no Windows) em vez de `scripts/run.sh`.
 - Um environment do skail no portal: o namespace, a chave e o endereço do servidor skail (o sidecar ao
   qual o worker se conecta).
   No portal, registre também o workload `nome:versão`.
@@ -72,6 +73,8 @@ scripts/run.sh up        # builda as duas imagens e sobe web + worker (CONTAINER
 scripts/run.sh logs
 scripts/run.sh down
 ```
+
+No Windows, ou em qualquer sistema com PowerShell 7+, rode `pwsh scripts/run.ps1 <comando>`: aceita os mesmos comandos do `run.sh` (`up`, `down`, `logs`, `restart`, `status`, ...), e `$env:CONTAINER_ENGINE = "docker"` força o docker.
 
 Abra <http://localhost:8080>, escolha a moeda e clique em **Iniciar**.
 
