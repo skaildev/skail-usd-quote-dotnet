@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-Uma function do skail consulta a cotação do dólar, espera 30 segundos com um delay durável e consulta de novo. Ela continua até você clicar em **Stop** ou chegar a 100 cotações, e uma página web mostra cada cotação assim que ela chega.
+Uma function do skail consulta a cotação do dólar, espera 30 segundos com um delay durável e consulta de novo. Ela continua até você clicar em **Stop** ou chegar a 20 cotações, e uma página web mostra cada cotação assim que ela chega.
 
 A demo mostra três tópicos da [documentação do skail](https://docs.skail.dev):
 
@@ -20,26 +20,26 @@ flowchart LR
     worker -- "POST /internal/runs/{id}/events" --> web
 ```
 
-- **worker** (`src/SkailUsdQuote.Worker`): a function `GetUsdQuote(runId, currency)` e os commands `FetchQuote` e `Notify`.
+- **worker** (`src/SkailUsdQuote.Worker`): a function `TrackUsdQuote(runId, currency)` e os commands dela. O `FetchQuote` consulta a cotação, e `ReportQuote`, `ReportStopped`, `ReportCompleted` e `ReportFailure` mandam o andamento para o web.
 - **web** (`src/SkailUsdQuote.Web`): página estática e API. Inicia a execução (trigger), para a execução (fire), guarda o estado em memória e transmite para a página (SSE).
 - **contracts** (`src/SkailUsdQuote.Contracts`): tipos e constantes usados pelo worker e pelo web.
 
-A function só orquestra e deixa o I/O para os commands. Ela cria uma única espera por `STOP_QUOTE` e reaproveita essa espera em todos os `WhenAny` contra o delay de 30 segundos. O trecho abaixo é uma versão simplificada do [`QuoteFunctions.cs`](src/SkailUsdQuote.Worker/QuoteFunctions.cs), que também avisa a página quando a consulta falha:
+A function só orquestra e deixa o I/O para os commands. Ela cria uma única espera por `STOP_TRACKING` e reaproveita essa espera em todos os `WhenAny` contra o delay de 30 segundos. O trecho abaixo é uma versão simplificada do [`QuoteFunctions.cs`](src/SkailUsdQuote.Worker/QuoteFunctions.cs), que também avisa a página quando a consulta falha:
 
 ```csharp
-var stopEvent = SkailTask.WaitForEvent(Events.StopQuote, runId);
+var stopEvent = SkailTask.WaitForEvent(Events.StopTracking, runId);
 
-for (var i = 1; i <= QuoteLimits.MaxIterations; i++)
+for (var quoteNumber = 1; quoteNumber <= QuoteLimits.MaxQuotes; quoteNumber++)
 {
     var quote = await commands.FetchQuote(currency);
-    await commands.Notify(runId, RunStage.Quoted, i, quote, null);
-    if (i == QuoteLimits.MaxIterations) break;
+    await commands.ReportQuote(runId, quoteNumber, quote);
+    if (quoteNumber == QuoteLimits.MaxQuotes) break;
 
     var interval = SkailTask.DelaySeconds(QuoteLimits.IntervalSeconds);
     if (await SkailTask.WhenAny(stopEvent, interval) == stopEvent)
     {
-        await commands.Notify(runId, RunStage.Stopped, i, quote, null);
-        return new RunResult(i, RunEnd.Stopped);
+        await commands.ReportStopped(runId, quoteNumber);
+        return new RunResult(quoteNumber, RunEnd.Stopped);
     }
 }
 ```
@@ -56,10 +56,10 @@ A página tem uma lista de moedas (Real, Euro, Yuan e Iene, com Real como padrã
 Os dois usam os mesmos `SKAIL_WORKLOAD`, `SKAIL_NAMESPACE` e `SKAIL_KEY`. O web faz duas chamadas:
 
 ```http
-POST {SKAIL_BASE_URL}/api/v1/trigger/{nome}/{versao}/GetUsdQuote/{runId}
+POST {SKAIL_BASE_URL}/api/v1/trigger/{nome}/{versao}/TrackUsdQuote/{runId}
 ["{runId}", "{currency}"]
 
-POST {SKAIL_BASE_URL}/api/v1/fire/STOP_QUOTE/{runId}
+POST {SKAIL_BASE_URL}/api/v1/fire/STOP_TRACKING/{runId}
 {}
 ```
 
@@ -102,7 +102,7 @@ Abra <http://localhost:8080>, escolha a moeda e clique em **Start**.
 3. A próxima cotação chega no horário, processada pelo worker reiniciado.
 4. Clique em **Stop** a qualquer momento, até no meio de uma espera. A function acorda e termina sem fazer outra consulta.
 
-No portal, abra o [Monitor](https://docs.skail.dev/referencia/portal/monitor) do seu environment para ver cada passo da execução: cada `FetchQuote` e `Notify`, cada delay e o evento `STOP_QUOTE`.
+No portal, abra o [Monitor](https://docs.skail.dev/referencia/portal/monitor) do seu environment para ver cada passo da execução: cada `FetchQuote` com a cotação que devolveu, cada `ReportQuote`, cada delay, o evento `STOP_TRACKING` e o resultado, com o número de cotações e como a execução terminou.
 
 ## VS Code
 

@@ -15,7 +15,7 @@ public sealed class SkailApiGateway(HttpClient http, SkailOptions options, Func<
     : ISkailGateway
 {
     public const int MaxAttempts = 5;
-    private const string FunctionName = "GetUsdQuote";
+    private const string FunctionName = "TrackUsdQuote";
 
     public Task TriggerAsync(string runId, Currency currency, CancellationToken ct = default)
     {
@@ -27,7 +27,7 @@ public sealed class SkailApiGateway(HttpClient http, SkailOptions options, Func<
 
     public Task FireStopAsync(string runId, CancellationToken ct = default) =>
         // the event carries no payload: an empty JSON object is enough
-        PostAsync($"api/v1/fire/{Events.StopQuote}/{Escape(runId)}", "{}", ct);
+        PostAsync($"api/v1/fire/{Events.StopTracking}/{Escape(runId)}", "{}", ct);
 
     private async Task PostAsync(string route, string body, CancellationToken ct)
     {

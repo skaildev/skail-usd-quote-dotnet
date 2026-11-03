@@ -27,7 +27,7 @@ public class GatewayTests
 
         var (request, body) = Assert.Single(handler.Calls);
         Assert.Equal(HttpMethod.Post, request.Method);
-        Assert.Equal("https://skail.example.test/api/v1/trigger/usd-quote/v0.0.1/GetUsdQuote/run-1", request.RequestUri!.ToString());
+        Assert.Equal("https://skail.example.test/api/v1/trigger/usd-quote/v0.0.1/TrackUsdQuote/run-1", request.RequestUri!.ToString());
         Assert.Equal("env-key", request.Headers.GetValues("skail-key").Single());
         Assert.Equal("Bearer env-key", request.Headers.GetValues("Authorization").Single());
         Assert.Equal("tenant-1/env-1", request.Headers.GetValues("Skail-namespace").Single());
@@ -45,7 +45,7 @@ public class GatewayTests
 
         var (request, body) = Assert.Single(handler.Calls);
         Assert.Equal(HttpMethod.Post, request.Method);
-        Assert.Equal("https://skail.example.test/api/v1/fire/STOP_QUOTE/run-9", request.RequestUri!.ToString());
+        Assert.Equal("https://skail.example.test/api/v1/fire/STOP_TRACKING/run-9", request.RequestUri!.ToString());
         Assert.Equal("env-key", request.Headers.GetValues("skail-key").Single());
         Assert.Equal("Bearer env-key", request.Headers.GetValues("Authorization").Single());
         Assert.Equal("tenant-1/env-1", request.Headers.GetValues("Skail-namespace").Single());
@@ -82,7 +82,7 @@ public class GatewayTests
 
         await Gateway(handler).FireStopAsync("a b/c");
 
-        Assert.EndsWith("/api/v1/fire/STOP_QUOTE/a%20b%2Fc", Assert.Single(handler.Calls).Request.RequestUri!.AbsoluteUri);
+        Assert.EndsWith("/api/v1/fire/STOP_TRACKING/a%20b%2Fc", Assert.Single(handler.Calls).Request.RequestUri!.AbsoluteUri);
     }
 
     [Theory]

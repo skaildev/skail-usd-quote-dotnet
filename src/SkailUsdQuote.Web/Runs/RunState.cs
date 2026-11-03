@@ -6,7 +6,7 @@ public sealed record RunState(
     string RunId,
     Currency Currency,
     RunStage Stage,
-    int Iteration,
+    int QuoteCount,
     IReadOnlyList<Quote> Quotes,
     string? Error,
     bool StopRequested)

@@ -113,8 +113,8 @@ public sealed record RunView(
     string RunId,
     Currency Currency,
     RunStage Stage,
-    int Iteration,
-    int MaxIterations,
+    int QuoteCount,
+    int MaxQuotes,
     int IntervalSeconds,
     IReadOnlyList<Quote> Quotes,
     string? Error,
@@ -122,7 +122,7 @@ public sealed record RunView(
     UiState Ui)
 {
     public static RunView From(RunState s) =>
-        new(s.RunId, s.Currency, s.Stage, s.Iteration, QuoteLimits.MaxIterations, QuoteLimits.IntervalSeconds,
+        new(s.RunId, s.Currency, s.Stage, s.QuoteCount, QuoteLimits.MaxQuotes, QuoteLimits.IntervalSeconds,
             s.Quotes, s.Error, s.StopRequested, ButtonRules.For(s));
 }
 

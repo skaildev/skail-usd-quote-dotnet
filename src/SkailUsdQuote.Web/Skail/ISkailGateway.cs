@@ -6,7 +6,7 @@ public sealed class SkailGatewayException(string message, Exception? inner = nul
 
 public interface ISkailGateway
 {
-    /// <summary>Starts the GetUsdQuote function; <paramref name="runId"/> is the execution id.</summary>
+    /// <summary>Starts the TrackUsdQuote function; <paramref name="runId"/> is the execution id.</summary>
     Task TriggerAsync(string runId, Currency currency, CancellationToken ct = default);
 
     /// <summary>Fires the external stop event whose instance id is the run id.</summary>

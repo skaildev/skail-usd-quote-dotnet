@@ -51,14 +51,14 @@ public sealed class RunStore
         lock (_gate)
         {
             if (!_runs.TryGetValue(evt.RunId, out var run) || run.IsTerminal) return false;
-            if (!_seen[evt.RunId].Add((evt.Stage, evt.Iteration))) return false;
+            if (!_seen[evt.RunId].Add((evt.Stage, evt.QuoteNumber))) return false;
 
-            var quotes = evt.Quote is not null && evt.Stage == RunStage.Quoted ? [.. run.Quotes, evt.Quote] : run.Quotes;
+            var isQuote = evt.Stage == RunStage.Quoted && evt.Quote is not null;
             var next = run with
             {
                 Stage = evt.Stage,
-                Iteration = Math.Max(run.Iteration, evt.Iteration),
-                Quotes = quotes,
+                QuoteCount = isQuote ? Math.Max(run.QuoteCount, evt.QuoteNumber) : run.QuoteCount,
+                Quotes = isQuote ? [.. run.Quotes, evt.Quote!] : run.Quotes,
                 Error = evt.Error ?? run.Error,
             };
             Publish(next);

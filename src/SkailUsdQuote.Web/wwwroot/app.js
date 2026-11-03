@@ -13,7 +13,7 @@ const els = {
 let run = null;
 let source = null;
 let countdownTimer = null;
-let lastQuoteIteration = 0;
+let lastQuoteCount = 0;
 let secondsLeft = 0;
 
 function fmt(currency, value) {
@@ -48,7 +48,7 @@ function render() {
   const stage = run?.stage;
   els.state.textContent = stage ? (STAGE_LABELS[stage] ?? stage) : 'Idle';
   els.state.className = 'badge ' + (stage === 'Failed' ? 'failed' : ['Stopped', 'Completed'].includes(stage) ? 'done' : stage ? 'active' : 'idle');
-  els.counter.textContent = run ? `${run.iteration}/${run.maxIterations}` : '';
+  els.counter.textContent = run ? `${run.quoteCount}/${run.maxQuotes}` : '';
   els.runId.textContent = run?.runId ?? '—';
   showError(run?.error);
 
@@ -85,8 +85,8 @@ function render() {
 // visual hint only: the real wait is the durable delay inside the function
 function updateCountdown() {
   const waiting = run && run.stage === 'Quoted' && !run.stopRequested;
-  if (waiting && run.iteration !== lastQuoteIteration) {
-    lastQuoteIteration = run.iteration;
+  if (waiting && run.quoteCount !== lastQuoteCount) {
+    lastQuoteCount = run.quoteCount;
     secondsLeft = run.intervalSeconds;
   }
   if (!waiting) {
@@ -127,7 +127,7 @@ async function start() {
     });
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);
     run = await res.json();
-    lastQuoteIteration = 0;
+    lastQuoteCount = 0;
     localStorage.setItem(STORAGE_KEY, run.runId);
     render();
     connect(run.runId);

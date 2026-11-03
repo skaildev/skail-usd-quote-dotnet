@@ -52,9 +52,9 @@ public class ContractsTests
     [Fact]
     public void Limits_and_event_name_are_the_agreed_constants()
     {
-        Assert.Equal(100, QuoteLimits.MaxIterations);
+        Assert.Equal(20, QuoteLimits.MaxQuotes);
         Assert.Equal(30, QuoteLimits.IntervalSeconds);
-        Assert.Equal("STOP_QUOTE", Events.StopQuote);
+        Assert.Equal("STOP_TRACKING", Events.StopTracking);
     }
 
     [Fact]
@@ -68,5 +68,13 @@ public class ContractsTests
 
         var back = JsonSerializer.Deserialize<RunEvent>(json, Json.Options);
         Assert.Equal(evt, back);
+    }
+
+    [Fact]
+    public void RunResult_serializes_the_end_as_text_for_the_monitor()
+    {
+        var json = JsonSerializer.Serialize(new RunResult(2, RunEnd.Stopped));
+
+        Assert.Equal("{\"QuoteCount\":2,\"End\":\"Stopped\"}", json);
     }
 }

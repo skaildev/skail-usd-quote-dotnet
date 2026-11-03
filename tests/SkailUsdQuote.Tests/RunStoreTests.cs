@@ -21,7 +21,7 @@ public class RunStoreTests
     }
 
     [Fact]
-    public void Quoted_event_appends_quote_and_updates_iteration()
+    public void Quoted_event_appends_quote_and_updates_quote_count()
     {
         var store = new RunStore();
         store.Create("r1", Currency.BRL);
@@ -31,12 +31,12 @@ public class RunStoreTests
 
         var run = store.Get("r1")!;
         Assert.Equal(RunStage.Quoted, run.Stage);
-        Assert.Equal(2, run.Iteration);
+        Assert.Equal(2, run.QuoteCount);
         Assert.Equal(new[] { 5.0m, 5.1m }, run.Quotes.Select(q => q.Rate));
     }
 
     [Fact]
-    public void Repeated_event_is_ignored_for_the_same_stage_and_iteration()
+    public void Repeated_event_is_ignored_for_the_same_stage_and_quote_number()
     {
         var store = new RunStore();
         store.Create("r1", Currency.BRL);
@@ -46,6 +46,21 @@ public class RunStoreTests
         Assert.False(store.Apply(evt));
 
         Assert.Single(store.Get("r1")!.Quotes);
+    }
+
+    [Fact]
+    public void Failure_keeps_the_count_of_quotes_received()
+    {
+        var store = new RunStore();
+        store.Create("r1", Currency.BRL);
+        store.Apply(new RunEvent("r1", RunStage.Quoted, 1, Q(5.0m)));
+
+        store.Apply(new RunEvent("r1", RunStage.Failed, 2, null, "Quote API answered 429"));
+
+        var run = store.Get("r1")!;
+        Assert.Equal(RunStage.Failed, run.Stage);
+        Assert.Equal(1, run.QuoteCount);
+        Assert.Equal("Quote API answered 429", run.Error);
     }
 
     [Theory]

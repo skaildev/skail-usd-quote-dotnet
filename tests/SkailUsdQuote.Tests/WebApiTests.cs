@@ -147,7 +147,7 @@ public class WebApiTests : IClassFixture<WebFactory>
 
         var run = await _http.GetFromJsonAsync<JsonElement>($"/api/runs/{runId}");
         Assert.Equal("Quoted", run.GetProperty("stage").GetString());
-        Assert.Equal(1, run.GetProperty("iteration").GetInt32());
+        Assert.Equal(1, run.GetProperty("quoteCount").GetInt32());
         Assert.Equal(0.92m, run.GetProperty("quotes")[0].GetProperty("rate").GetDecimal());
     }
 

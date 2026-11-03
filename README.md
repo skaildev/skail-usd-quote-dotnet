@@ -2,7 +2,7 @@
 
 [Português (Brasil)](README.pt-BR.md)
 
-A skail function fetches the US dollar quote, waits 30 seconds with a durable delay and fetches again. It keeps going until you press **Stop** or it reaches 100 quotes, and a web page shows each quote as it arrives.
+A skail function fetches the US dollar quote, waits 30 seconds with a durable delay and fetches again. It keeps going until you press **Stop** or it reaches 20 quotes, and a web page shows each quote as it arrives.
 
 The demo covers three topics of the [skail docs](https://docs.skail.dev) (in Portuguese):
 
@@ -20,26 +20,26 @@ flowchart LR
     worker -- "POST /internal/runs/{id}/events" --> web
 ```
 
-- **worker** (`src/SkailUsdQuote.Worker`): the function `GetUsdQuote(runId, currency)` and its commands `FetchQuote` and `Notify`.
+- **worker** (`src/SkailUsdQuote.Worker`): the function `TrackUsdQuote(runId, currency)` and its commands. `FetchQuote` gets the quote; `ReportQuote`, `ReportStopped`, `ReportCompleted` and `ReportFailure` send the progress to the web app.
 - **web** (`src/SkailUsdQuote.Web`): static page and API. It starts a run (trigger), stops it (fire), keeps the run state in memory and streams it to the page (SSE).
 - **contracts** (`src/SkailUsdQuote.Contracts`): types and constants shared by the worker and the web app.
 
-The function only orchestrates and leaves the I/O to the commands. It creates one wait for `STOP_QUOTE` and reuses it in every `WhenAny` against the 30-second delay. Simplified from [`QuoteFunctions.cs`](src/SkailUsdQuote.Worker/QuoteFunctions.cs), which also reports a failed fetch to the page:
+The function only orchestrates and leaves the I/O to the commands. It creates one wait for `STOP_TRACKING` and reuses it in every `WhenAny` against the 30-second delay. Simplified from [`QuoteFunctions.cs`](src/SkailUsdQuote.Worker/QuoteFunctions.cs), which also reports a failed fetch to the page:
 
 ```csharp
-var stopEvent = SkailTask.WaitForEvent(Events.StopQuote, runId);
+var stopEvent = SkailTask.WaitForEvent(Events.StopTracking, runId);
 
-for (var i = 1; i <= QuoteLimits.MaxIterations; i++)
+for (var quoteNumber = 1; quoteNumber <= QuoteLimits.MaxQuotes; quoteNumber++)
 {
     var quote = await commands.FetchQuote(currency);
-    await commands.Notify(runId, RunStage.Quoted, i, quote, null);
-    if (i == QuoteLimits.MaxIterations) break;
+    await commands.ReportQuote(runId, quoteNumber, quote);
+    if (quoteNumber == QuoteLimits.MaxQuotes) break;
 
     var interval = SkailTask.DelaySeconds(QuoteLimits.IntervalSeconds);
     if (await SkailTask.WhenAny(stopEvent, interval) == stopEvent)
     {
-        await commands.Notify(runId, RunStage.Stopped, i, quote, null);
-        return new RunResult(i, RunEnd.Stopped);
+        await commands.ReportStopped(runId, quoteNumber);
+        return new RunResult(quoteNumber, RunEnd.Stopped);
     }
 }
 ```
@@ -56,10 +56,10 @@ The page has a currency list (Real, Euro, Yuan, Yen; Real is the default), locke
 Both use the same `SKAIL_WORKLOAD`, `SKAIL_NAMESPACE` and `SKAIL_KEY`. The web app makes two calls:
 
 ```http
-POST {SKAIL_BASE_URL}/api/v1/trigger/{name}/{version}/GetUsdQuote/{runId}
+POST {SKAIL_BASE_URL}/api/v1/trigger/{name}/{version}/TrackUsdQuote/{runId}
 ["{runId}", "{currency}"]
 
-POST {SKAIL_BASE_URL}/api/v1/fire/STOP_QUOTE/{runId}
+POST {SKAIL_BASE_URL}/api/v1/fire/STOP_TRACKING/{runId}
 {}
 ```
 
@@ -102,7 +102,7 @@ Open <http://localhost:8080>, pick a currency and press **Start**.
 3. The next quote arrives on schedule, handled by the restarted worker.
 4. Press **Stop** at any time, even in the middle of a wait. The function wakes up and ends without another fetch.
 
-In the portal, open the [Monitor](https://docs.skail.dev/referencia/portal/monitor) of your environment to see every step of the run: each `FetchQuote` and `Notify`, each delay and the `STOP_QUOTE` event.
+In the portal, open the [Monitor](https://docs.skail.dev/referencia/portal/monitor) of your environment to see every step of the run: each `FetchQuote` with the quote it returned, each `ReportQuote`, each delay, the `STOP_TRACKING` event and the result, with the number of quotes and how the run ended.
 
 ## VS Code
 
