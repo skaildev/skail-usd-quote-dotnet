@@ -6,7 +6,7 @@ using SkailUsdQuote.Worker.Quotes;
 
 namespace SkailUsdQuote.Worker;
 
-/// <summary>Commands are the demo's I/O: each does one thing only (a retry re-runs the whole command).</summary>
+/// <summary>The demo's I/O. Each command does a single thing, because a retry runs the whole command again.</summary>
 public class QuoteCommands(IQuoteProvider quotes, IProgressNotifier notifier)
 {
     [SkailCommand(retryCount: 3)]

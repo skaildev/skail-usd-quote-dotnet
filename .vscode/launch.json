@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Worker (skailFunc)",
+      "name": "Worker",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
@@ -10,14 +10,14 @@
       "cwd": "${workspaceFolder}/src/SkailUsdQuote.Worker",
       "envFile": "${workspaceFolder}/.env",
       "env": {
-        // outside a container the web app is on localhost; the skail address comes from .env
+        // outside a container the web app is on localhost
         "WEB_BASE_URL": "http://localhost:8080"
       },
       "console": "internalConsole",
       "stopAtEntry": false
     },
     {
-      "name": "Web (front end)",
+      "name": "Web",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
@@ -38,7 +38,7 @@
   "compounds": [
     {
       "name": "Worker + Web",
-      "configurations": ["Web (front end)", "Worker (skailFunc)"],
+      "configurations": ["Web", "Worker"],
       "stopAll": true
     }
   ]

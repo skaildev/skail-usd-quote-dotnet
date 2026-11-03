@@ -1,9 +1,9 @@
 #!/usr/bin/env pwsh
-# Builds and runs the front end (web) and the skailFunc (worker) with podman or docker.
-# The skail server is the one of your environment in the skail portal (SKAIL_SIDECAR and SKAIL_BASE_URL
-# in .env); nothing skail-related runs locally.
+# Builds and runs the web app and the worker (the skail function) with podman or docker.
+# Both connect to your skail environment with the values in .env; nothing from skail runs locally.
 #
 # Usage: scripts/run.ps1 [build|up|down|restart|logs|status]   (default: up)
+#   restart  restarts only the worker, so a run survives it while the web app keeps the page state
 # Override the engine with $env:CONTAINER_ENGINE = 'docker' or 'podman'.
 # Same as scripts/run.sh, for PowerShell 7+ (pwsh): runs on Windows, Linux and macOS.
 param([string]$Command = 'up')
@@ -33,7 +33,7 @@ foreach ($line in Get-Content .env) {
     }
 }
 
-# ${NAME:-default}: the default also applies when the variable is empty
+# value of the setting, or the default when it is missing or empty (like ${NAME:-default} in bash)
 function Get-Setting([string]$Key, [string]$Default = '') {
     $value = [Environment]::GetEnvironmentVariable($Key)
     if ([string]::IsNullOrEmpty($value)) { $Default } else { $value }
@@ -68,7 +68,6 @@ function Initialize-Network {
 function Start-Worker {
     Initialize-Network
     Invoke-EngineQuiet rm -f $Worker
-    # resource limits for the worker: 1 GB of memory and 1 CPU
     Invoke-Engine run -d --name $Worker --network $Network --env-file .env --memory 1g --cpus 1 $Worker | Out-Null
 }
 
@@ -79,8 +78,8 @@ function Start-Stack {
     $port = Get-Setting 'WEB_PORT' '8080'
     Invoke-Engine run -d --name $Web --network $Network --env-file .env -p "${port}:8080" $Web | Out-Null
     Start-Worker
-    Write-Host "front end: http://localhost:$port"
-    Write-Host 'logs:      scripts/run.ps1 logs'
+    Write-Host "web app: http://localhost:$port"
+    Write-Host 'logs:    scripts/run.ps1 logs'
 }
 
 function Show-Logs {
@@ -93,7 +92,7 @@ switch ($Command.Trim()) {
     'build' { Build-Images }
     'up' { Start-Stack }
     'down' { Remove-Containers }
-    'restart' { Invoke-Engine restart $Worker $Web }
+    'restart' { Invoke-Engine restart $Worker }
     'logs' { Show-Logs }
     'status' { Invoke-Engine ps --filter 'name=usd-quote' }
     default {

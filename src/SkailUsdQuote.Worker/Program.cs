@@ -9,7 +9,6 @@ using SkailUsdQuote.Worker.Quotes;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// Skail configuration (SKAIL_WORKLOAD, SKAIL_NAMESPACE, SKAIL_KEY, SKAIL_SIDECAR) comes from environment variables (.env)
 var webBaseUrl = Environment.GetEnvironmentVariable("WEB_BASE_URL") ?? "http://localhost:8080";
 var provider = Environment.GetEnvironmentVariable("QUOTE_PROVIDER") ?? "http";
 var quoteApiUrl = Environment.GetEnvironmentVariable("QUOTE_API_URL") ?? "https://economia.awesomeapi.com.br/";
@@ -29,6 +28,7 @@ builder.Services.AddHttpClient<IProgressNotifier, HttpProgressNotifier>(c =>
     c.Timeout = TimeSpan.FromSeconds(10);
 });
 
+// reads SKAIL_WORKLOAD, SKAIL_NAMESPACE, SKAIL_KEY and SKAIL_SIDECAR from the environment (.env)
 builder.UseSkail();
 
 await builder.Build().RunAsync();

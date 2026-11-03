@@ -2,13 +2,13 @@ namespace SkailUsdQuote.Web.Skail;
 
 public sealed class SkailOptions
 {
-    /// <summary>Base URL of the skail HTTP API for the environment (SKAIL_BASE_URL, same value as SKAIL_SIDECAR).</summary>
+    /// <summary>SKAIL_BASE_URL: base URL of the skail HTTP API for the environment, without /api/v1.</summary>
     public string BaseUrl { get; init; } = "";
 
     /// <summary>SKAIL_NAMESPACE (tenant/environment), sent in the Skail-namespace header.</summary>
     public string Namespace { get; init; } = "";
 
-    /// <summary>SKAIL_KEY, sent in the skail-key header. Sensitive.</summary>
+    /// <summary>SKAIL_KEY, sent in the skail-key and Authorization headers. Secret.</summary>
     public string Key { get; init; } = "";
 
     /// <summary>SKAIL_WORKLOAD as name:version, exactly as registered in the portal.</summary>

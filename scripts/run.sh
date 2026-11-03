@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Builds and runs the front end (web) and the skailFunc (worker) with podman or docker.
-# The skail server is the one of your environment in the skail portal (SKAIL_SIDECAR and SKAIL_BASE_URL
-# in .env); nothing skail-related runs locally.
+# Builds and runs the web app and the worker (the skail function) with podman or docker.
+# Both connect to your skail environment with the values in .env; nothing from skail runs locally.
 #
 # Usage: scripts/run.sh [build|up|down|restart|logs|status]   (default: up)
+#   restart  restarts only the worker, so a run survives it while the web app keeps the page state
 # Override the engine with CONTAINER_ENGINE=docker|podman.
 set -euo pipefail
 
@@ -48,19 +48,18 @@ up() {
   "$ENGINE" run -d --name "$WEB" --network "$NETWORK" \
     --env-file .env -p "${WEB_PORT:-8080}:8080" "$WEB" >/dev/null
 
-  # resource limits for the worker: 1 GB of memory and 1 CPU
   "$ENGINE" run -d --name "$WORKER" --network "$NETWORK" \
     --env-file .env --memory 1g --cpus 1 "$WORKER" >/dev/null
 
-  echo "front end: http://localhost:${WEB_PORT:-8080}"
-  echo "logs:      scripts/run.sh logs"
+  echo "web app: http://localhost:${WEB_PORT:-8080}"
+  echo "logs:    scripts/run.sh logs"
 }
 
 case "${1:-up}" in
   build) build ;;
   up) up ;;
   down) down ;;
-  restart) "$ENGINE" restart "$WORKER" "$WEB" ;;
+  restart) "$ENGINE" restart "$WORKER" ;;
   logs) "$ENGINE" logs -f --tail 100 "$WORKER" "$WEB" 2>&1 || "$ENGINE" logs -f "$WORKER" ;;
   status) "$ENGINE" ps --filter "name=usd-quote" ;;
   *) echo "Usage: $0 [build|up|down|restart|logs|status]" >&2; exit 1 ;;

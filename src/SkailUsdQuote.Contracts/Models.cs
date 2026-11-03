@@ -31,5 +31,5 @@ public enum RunEnd
 
 public sealed record RunResult(int Iterations, RunEnd End);
 
-/// <summary>Progresso enviado pelo worker ao web (command Notify).</summary>
+/// <summary>Progress the worker sends to the web app (Notify command).</summary>
 public sealed record RunEvent(string RunId, RunStage Stage, int Iteration, Quote? Quote, string? Error = null);
