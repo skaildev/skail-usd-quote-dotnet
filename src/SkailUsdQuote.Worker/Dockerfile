@@ -1,7 +1,6 @@
 # Build context: repository root.
 #   podman build -f src/SkailUsdQuote.Worker/Dockerfile -t usd-quote-worker .
-# The IL weaving of Skail.Platform.Runtime.Build happens in dotnet publish (SDK image);
-# the final image only needs the .NET runtime.
+# dotnet publish runs in the SDK image; the final image only needs the .NET runtime.
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY nuget.config ./

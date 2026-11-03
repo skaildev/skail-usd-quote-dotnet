@@ -115,13 +115,15 @@ public sealed record RunView(
     RunStage Stage,
     int Iteration,
     int MaxIterations,
+    int IntervalSeconds,
     IReadOnlyList<Quote> Quotes,
     string? Error,
     bool StopRequested,
     UiState Ui)
 {
     public static RunView From(RunState s) =>
-        new(s.RunId, s.Currency, s.Stage, s.Iteration, QuoteLimits.MaxIterations, s.Quotes, s.Error, s.StopRequested, ButtonRules.For(s));
+        new(s.RunId, s.Currency, s.Stage, s.Iteration, QuoteLimits.MaxIterations, QuoteLimits.IntervalSeconds,
+            s.Quotes, s.Error, s.StopRequested, ButtonRules.For(s));
 }
 
 public partial class Program;
