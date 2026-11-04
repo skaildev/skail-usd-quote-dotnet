@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>USD quote · skail demo</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>USD quote</h1>
+      <p class="subtitle">A skail function fetches the dollar price every 30 seconds (durable delay) until you stop it.</p>
+    </header>
+
+    <section class="controls">
+      <label for="currency">Currency</label>
+      <select id="currency">
+        <option value="BRL" selected>Real (BRL)</option>
+        <option value="EUR">Euro (EUR)</option>
+        <option value="CNY">Yuan (CNY)</option>
+        <option value="JPY">Yen (JPY)</option>
+      </select>
+      <button id="toggle" type="button">Start</button>
+    </section>
+
+    <section class="status">
+      <span id="state" class="badge idle">Idle</span>
+      <span id="counter"></span>
+      <span id="countdown"></span>
+    </section>
+
+    <p id="error" class="error" hidden></p>
+
+    <section class="current">
+      <div class="pair" id="pair">USD → —</div>
+      <div class="rate" id="rate">—</div>
+      <div class="variation" id="variation"></div>
+      <div class="time" id="time"></div>
+    </section>
+
+    <section>
+      <h2>Latest quotes</h2>
+      <table>
+        <thead><tr><th>#</th><th>Rate</th><th>Time</th></tr></thead>
+        <tbody id="history"></tbody>
+      </table>
+    </section>
+
+    <footer>Run <code id="runId">—</code></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

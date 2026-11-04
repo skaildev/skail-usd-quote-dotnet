@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- PrivateAssets keeps the skail build step in this project; the tests reference it and must not run that step -->
+    <PackageReference Include="Skail.Platform.Runtime" Version="2.2.2" PrivateAssets="build;buildtransitive;analyzers" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
+    <PackageReference Include="Skail.Platform.Analyzer" Version="2.2.2" PrivateAssets="all" />
+    <ProjectReference Include="..\SkailUsdQuote.Contracts\SkailUsdQuote.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
