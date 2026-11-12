@@ -13,8 +13,15 @@ public static class Events
     public const string StopTracking = "STOP_TRACKING";
 }
 
-/// <summary>Price of 1 USD in the given currency (ISO code).</summary>
-public sealed record Quote(string Currency, decimal Rate, DateTimeOffset At);
+/// <summary>
+/// Price of 1 USD in the given currency (ISO code). SourceTime is when the source published the rate;
+/// FetchedAt is when the function fetched it. The source publishes a new rate only every few minutes,
+/// so consecutive fetches can carry the same rate and SourceTime.
+/// </summary>
+public sealed record Quote(string Currency, decimal Rate, DateTimeOffset SourceTime)
+{
+    public DateTimeOffset FetchedAt { get; init; }
+}
 
 [JsonConverter(typeof(JsonStringEnumConverter<RunStage>))]
 public enum RunStage

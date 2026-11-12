@@ -23,4 +23,9 @@ button:disabled, select:disabled { opacity: .55; cursor: not-allowed; }
 .time { color: var(--muted); font-size: .9rem; }
 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 th, td { text-align: left; padding: .3rem .5rem; border-bottom: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
+th { position: relative; white-space: nowrap; }
+.info { display: inline-grid; place-items: center; width: 1.1rem; height: 1.1rem; margin-left: .25rem; border-radius: 50%; border: 1px solid var(--muted); color: var(--muted); font: italic 600 .75rem/1 Georgia, serif; cursor: help; vertical-align: middle; }
+.info:hover, .info:focus-visible { color: var(--accent); border-color: var(--accent); outline: none; }
+.tooltip { display: none; position: absolute; right: 0; top: 100%; z-index: 1; width: min(18rem, 80vw); padding: .6rem .75rem; border-radius: .5rem; background: Canvas; color: CanvasText; border: 1px solid color-mix(in srgb, CanvasText 25%, transparent); box-shadow: 0 4px 16px rgb(0 0 0 / .25); font-weight: 400; font-size: .85rem; line-height: 1.4; white-space: normal; }
+.info:hover + .tooltip, .info:focus + .tooltip { display: block; }
 footer { margin-top: 2rem; color: var(--muted); font-size: .85rem; }

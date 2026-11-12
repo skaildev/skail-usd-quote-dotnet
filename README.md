@@ -20,7 +20,7 @@ flowchart LR
     worker -- "POST /internal/runs/{id}/events" --> web
 ```
 
-- **worker** (`src/SkailUsdQuote.Worker`): the function `TrackUsdQuote(runId, currency)` and its commands. `FetchQuote` gets the quote; `ReportQuote`, `ReportStopped`, `ReportCompleted` and `ReportFailure` send the progress to the web app.
+- **worker** (`src/SkailUsdQuote.Worker`): the function `TrackUsdQuote(runId, currency)` and its commands. `FetchQuote` gets the quote and records when it fetched it; `ReportQuote`, `ReportStopped`, `ReportCompleted` and `ReportFailure` send the progress to the web app.
 - **web** (`src/SkailUsdQuote.Web`): static page and API. It starts a run (trigger), stops it (fire), keeps the run state in memory and streams it to the page (SSE).
 - **contracts** (`src/SkailUsdQuote.Contracts`): types and constants shared by the worker and the web app.
 
@@ -95,11 +95,13 @@ scripts/run.sh down
 
 Open <http://localhost:8080>, pick a currency and press **Start**.
 
+Each quote in the table has two times. **Fetched at** is when the function fetched the quote, every 30 seconds. **Source time** is when AwesomeAPI published that rate. The source publishes a new rate only every few minutes, so consecutive fetches can show the same rate and the same source time.
+
 ### See the durability
 
 1. Press **Start** and wait for the first quote.
 2. During the 30-second wait, run `scripts/run.sh restart`. It restarts only the worker; the web app keeps the page state.
-3. The next quote arrives on schedule, handled by the restarted worker.
+3. The next quote arrives on schedule, handled by the restarted worker: **Fetched at** keeps the 30-second interval.
 4. Press **Stop** at any time, even in the middle of a wait. The function wakes up and ends without another fetch.
 
 In the portal, open the [Monitor](https://docs.skail.dev/referencia/portal/monitor) of your environment and click the run. Each quote shows up as `FetchQuote` and `ReportQuote`, each wait as a `WhenAny` with its `Delay`, and the stop as `ReportStopped`. The `WaitForEvent` for `STOP_TRACKING` shows up once, at the top, because the function creates that wait at the start and reuses it.

@@ -20,7 +20,7 @@ flowchart LR
     worker -- "POST /internal/runs/{id}/events" --> web
 ```
 
-- **worker** (`src/SkailUsdQuote.Worker`): a function `TrackUsdQuote(runId, currency)` e os commands dela. O `FetchQuote` consulta a cotação, e `ReportQuote`, `ReportStopped`, `ReportCompleted` e `ReportFailure` mandam o andamento para o web.
+- **worker** (`src/SkailUsdQuote.Worker`): a function `TrackUsdQuote(runId, currency)` e os commands dela. O `FetchQuote` consulta a cotação e registra a hora da consulta, e `ReportQuote`, `ReportStopped`, `ReportCompleted` e `ReportFailure` mandam o andamento para o web.
 - **web** (`src/SkailUsdQuote.Web`): página estática e API. Inicia a execução (trigger), para a execução (fire), guarda o estado em memória e transmite para a página (SSE).
 - **contracts** (`src/SkailUsdQuote.Contracts`): tipos e constantes usados pelo worker e pelo web.
 
@@ -95,11 +95,13 @@ scripts/run.sh down
 
 Abra <http://localhost:8080>, escolha a moeda e clique em **Start**.
 
+Cada cotação da tabela tem duas horas. **Fetched at** é a hora em que a function consultou a cotação, a cada 30 segundos. **Source time** é a hora em que a AwesomeAPI publicou aquele valor. A fonte só publica um valor novo a cada alguns minutos, então consultas seguidas podem mostrar o mesmo valor e a mesma hora da fonte.
+
 ### Ver a durabilidade
 
 1. Clique em **Start** e espere a primeira cotação.
 2. Durante a espera de 30 segundos, rode `scripts/run.sh restart`. Ele reinicia só o worker, e o web mantém o estado da página.
-3. A próxima cotação chega no horário, processada pelo worker reiniciado.
+3. A próxima cotação chega no horário, processada pelo worker reiniciado: o **Fetched at** mantém o intervalo de 30 segundos.
 4. Clique em **Stop** a qualquer momento, até no meio de uma espera. A function acorda e termina sem fazer outra consulta.
 
 No portal, abra o [Monitor](https://docs.skail.dev/referencia/portal/monitor) do seu environment e clique na execução. Cada cotação aparece como `FetchQuote` e `ReportQuote`, cada espera como um `WhenAny` com o seu `Delay`, e o Stop como `ReportStopped`. O `WaitForEvent` do `STOP_TRACKING` aparece uma vez só, no topo, porque a function cria essa espera no início e reaproveita.

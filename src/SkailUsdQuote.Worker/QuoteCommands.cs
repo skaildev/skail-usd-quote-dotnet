@@ -18,7 +18,10 @@ public class QuoteCommands(IQuoteProvider quotes, IProgressNotifier notifier)
         if (!Currencies.TryParse(currency, out var parsed))
             throw new ArgumentException($"Invalid currency: {currency}", nameof(currency));
 
-        return await quotes.GetAsync(parsed);
+        var quote = await quotes.GetAsync(parsed);
+
+        // the clock is read inside the command: the time is recorded with the result and stays the same on replay
+        return quote with { FetchedAt = DateTimeOffset.UtcNow };
     }
 
     [SkailCommand(retryCount: 3)]

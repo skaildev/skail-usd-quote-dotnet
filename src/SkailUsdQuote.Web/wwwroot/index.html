@@ -42,7 +42,18 @@
     <section>
       <h2>Latest quotes</h2>
       <table>
-        <thead><tr><th>#</th><th>Rate</th><th>Time</th></tr></thead>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Rate</th>
+            <th>Fetched at</th>
+            <th>
+              Source time
+              <span class="info" tabindex="0" aria-describedby="source-time-help">i</span>
+              <span id="source-time-help" class="tooltip" role="tooltip">When the quote source (AwesomeAPI) published this rate. The skail function fetches every 30 seconds, but the source publishes a new rate only every few minutes, so consecutive fetches can show the same rate and source time.</span>
+            </th>
+          </tr>
+        </thead>
         <tbody id="history"></tbody>
       </table>
     </section>

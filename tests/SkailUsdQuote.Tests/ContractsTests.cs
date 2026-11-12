@@ -61,10 +61,15 @@ public class ContractsTests
     public void RunEvent_roundtrips_with_enums_as_strings()
     {
         var evt = new RunEvent("run-1", RunStage.Quoted, 3,
-            new Quote("BRL", 5.25m, DateTimeOffset.Parse("2026-10-22T10:00:00Z")));
+            new Quote("BRL", 5.25m, DateTimeOffset.Parse("2026-10-22T10:00:00Z"))
+            {
+                FetchedAt = DateTimeOffset.Parse("2026-10-22T10:00:30Z"),
+            });
 
         var json = JsonSerializer.Serialize(evt, Json.Options);
         Assert.Contains("\"stage\":\"Quoted\"", json);
+        Assert.Contains("\"sourceTime\":\"2026-10-22T10:00:00+00:00\"", json);
+        Assert.Contains("\"fetchedAt\":\"2026-10-22T10:00:30+00:00\"", json);
 
         var back = JsonSerializer.Deserialize<RunEvent>(json, Json.Options);
         Assert.Equal(evt, back);

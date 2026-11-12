@@ -58,7 +58,9 @@ function render() {
   const prev = quotes.at(-2);
   els.pair.textContent = `USD → ${run?.currency ?? els.currency.value}`;
   els.rate.textContent = last ? fmt(last.currency, last.rate) : '—';
-  els.time.textContent = last ? new Date(last.at).toLocaleString() : '';
+  els.time.textContent = last
+    ? `Fetched at ${new Date(last.fetchedAt).toLocaleTimeString()} · source time ${new Date(last.sourceTime).toLocaleTimeString()}`
+    : '';
   if (last && prev) {
     const diff = last.rate - prev.rate;
     const pct = prev.rate ? (diff / prev.rate) * 100 : 0;
@@ -72,7 +74,9 @@ function render() {
   els.history.replaceChildren(...quotes.slice(-10).reverse().map((q, i) => {
     const row = document.createElement('tr');
     const n = quotes.length - i;
-    for (const text of [n, fmt(q.currency, q.rate), new Date(q.at).toLocaleTimeString()]) {
+    const fetchedAt = new Date(q.fetchedAt).toLocaleTimeString();
+    const sourceTime = new Date(q.sourceTime).toLocaleTimeString();
+    for (const text of [n, fmt(q.currency, q.rate), fetchedAt, sourceTime]) {
       const cell = document.createElement('td');
       cell.textContent = text;
       row.append(cell);

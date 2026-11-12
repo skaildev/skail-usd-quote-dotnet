@@ -33,7 +33,7 @@ public class QuoteProviderTests
 
         Assert.Equal("BRL", quote.Currency);
         Assert.Equal(5.2512m, quote.Rate);
-        Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1761130800), quote.At);
+        Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1761130800), quote.SourceTime);
     }
 
     [Fact]
